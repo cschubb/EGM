@@ -1,0 +1,106 @@
+---
+title: "GPT_Screening"
+author: "Caroline Sutton Chubb"
+date: "2023-11-12"
+output: html_document
+---
+Using ChatGPT for Title and Abstract Screening in Systematic Reviews
+Source: [https://mikkelvembye.github.io/AIscreenR/articles/Using-ChatGPT-For-Screening.html]
+
+# Preparation
+```{r load-pacakges, message=FALSE}
+# Installation if missing
+install.packages("devtools")
+devtools::install_github("MikkelVembye/AIscreenR")
+
+# Load packages 
+library(AIscreenR)
+library(revtools)
+library(tibble)
+library(dplyr)
+# library(purrr) Removed due to error
+library(usethis)
+library(future)
+library(readr) # To use read_csv
+```
+
+```{r prepare-files, warning=FALSE}
+# Load RIS file
+screen_dat <- revtools::read_bibliography("Screening1_withResults.ris")
+
+# Decision Key
+decisions <- read_csv("customizations_log.csv")
+
+# Merge to include decisions
+
+decisions <- decisions %>%
+              group_by(article_id, user_id, key)
+
+```
+
+## Create Prompt 
+```{r prompt}
+prompt <- "Evaluate the following study based on the selection criteria for a systematic review on the use of R statistical programming in the course curriculum for applied research or statistics course at the college and university level. This search will include any studies that examine the use of R in an applied research course at the undergraduate or graduate level. This includes experimental, quasi experimental, observational, and qualitative studies. I would like to assess (1) Did the study include the R programming language? (2) Did the study take place in a college or university setting? (3) Does the study involve discipline(s) other than computer science? (4) Does the look at student experiences?"
+```
+
+## Prepare for Test 
+Running test with one single study to avoid upcharges. 
+```{r subset-test eval=FALSE}
+test_data <- subset()
+```
+
+## API Key Set Up
+
+```{r eval=FALSE}
+
+```
+
+## Rate Limits
+In order to calculate rate limits, you must set up API 
+```{r rate-limits, eval=FALSE, include=FALSE}
+# Rate limits across one model (Default is "gpt-3.5-turbo-0613")
+rate_limits <- rate_limits_per_minute()
+rate_limits
+
+
+# Rate limits overview across multiple models
+# Add further models if necessary
+models <- c("gpt-3.5-turbo-0613", "gpt-4")
+
+models_rate_limits <- rate_limits_per_minute(model = models) 
+models_rate_limits
+```
+### Price
+This price is an estimate of 100% Chat GPT screening.  Price may vary depending on ChatGPT version used. 
+```{r API-price}
+app_obj <- 
+  approximate_price_gpt(
+    data = screen_dat, # RIS data
+    prompt = prompt, 
+    studyid = accession, # indicate the variable with the studyid in the data
+    title = title, # indicate the variable with the titles in the data
+    abstract = abstract, # indicate the variable with the abstracts in the data
+    model = c("gpt-3.5-turbo-0613", "gpt-3.5-turbo-0613", "gpt-4"),
+    reps = c(1, 10, 1),
+    top_p = c(0.001, 1)
+  )
+
+app_obj
+
+app_obj$price_dollar
+app_obj$price_data
+```
+# Screening titles and abstracts
+```{r}
+
+```
+
+## Screening failed requests
+
+## Getting the results from the screening
+
+# Analyzing the screening
+
+## Simple table
+
+## False included and excluded (by gpt)

@@ -1,0 +1,19 @@
+"0","# Load RIS file"
+"0","screen_dat <- revtools::read_bibliography(""Screening1_withResults.ris"")"
+"0",""
+"0","# Decision Key"
+"0","decisions <- read_csv(""customizations_log.csv"")"
+"2","[1mRows: [22m[34m8825[39m [1mColumns: [22m[34m6[39m"
+"2","[36m──[39m [1mColumn specification[22m [36m──────────────────────────────────────────────────────────────────────────────────────────[39m
+[1mDelimiter:[22m "",""
+[31mchr[39m  (3): user_email, key, value
+[32mdbl[39m  (2): user_id, article_id
+[34mdttm[39m (1): created_at"
+"2","
+[36mℹ[39m Use `spec()` to retrieve the full column specification for this data.
+[36mℹ[39m Specify the column types or set `show_col_types = FALSE` to quiet this message."
+"0","# Merge to include decisions"
+"0",""
+"0","decisions <- decisions %>%"
+"0","              group_by(article_id, user_id, key)"
+"0",""
