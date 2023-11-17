@@ -1,0 +1,67 @@
+---
+title: "Git"
+author: "Caroline Sutton Chubb"
+date: "2023-11-16"
+output: html_document
+---
+https://sites.northwestern.edu/researchcomputing/resources/using-git-and-github-with-r-rstudio/
+
+# Install the usethis package
+
+Install the usethis package for R
+
+
+```{r}
+#install.packages("usethis")
+library(usethis)
+```
+
+# Git Configuration
+In either the Terminal (Mac) or Git Bash (Windows), type git config -l (that last letter is a lowercase L) to view the existing configuration settings.  You want to have at least user.name and user.email set.  To set these, run the following commands with your name and email substituted in instead.
+
+git config --global user.name "John Doe"
+git config --global user.email johndoe@example.com
+
+These commands will set (or change) the user.name and user.email.  You must use the email associated with your GitHub account.
+
+You can also do this via the usethis package in R: usethis::use_git_config(user.name="Jane Doe", user.email="jane@example.org")
+
+```{r}
+usethis::use_git_config(user.name="cschubb", user.email="carolinesutton23@hotmail.com")
+```
+
+# Linking to GitHub
+
+When it’s time to send your files to GitHub, GitHub needs to know who you are and that you have authorization to write to your repositories.  This authorization can be established using either a personal access token or a SSH key.
+
+## PAT
+
+This is a very minimal account of getting and storing a PAT. This might be all you need when you’re first getting yourself set up. You can always come back later and read other parts of this chapter.
+
+Go to https://github.com/settings/tokens and click “Generate token”.
+
+Or, from R, do:
+
+> usethis::create_github_token()
+
+Look over the scopes; I highly recommend selecting “repo”, “user”, and “workflow”. Recommended scopes will be pre-selected if you used create_github_token().
+
+Click “Generate token”.
+
+Copy the generated PAT to your clipboard. Or leave that browser window open and available for a little while, so you can come back to copy the PAT.
+
+Provide this PAT next time a Git operation asks for your password2.
+
+You could even get out ahead of this and store the PAT explicitly right now. In R, call gitcreds::gitcreds_set() to get a prompt where you can paste your PAT:
+
+> gitcreds::gitcreds_set()
+
+>? Enter password or token: ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+-> Adding new credentials...
+-> Removing credentials from cache...
+-> Done.
+
+```{r}
+
+```
+

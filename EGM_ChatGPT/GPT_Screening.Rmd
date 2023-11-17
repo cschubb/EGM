@@ -10,8 +10,8 @@ Source: [https://mikkelvembye.github.io/AIscreenR/articles/Using-ChatGPT-For-Scr
 # Preparation
 ```{r load-pacakges, message=FALSE}
 # Installation if missing
-install.packages("devtools")
-devtools::install_github("MikkelVembye/AIscreenR")
+#install.packages("devtools")
+#devtools::install_github("MikkelVembye/AIscreenR")
 
 # Load packages 
 library(AIscreenR)
@@ -29,7 +29,7 @@ library(readr) # To use read_csv
 screen_dat <- revtools::read_bibliography("Screening1_withResults.ris")
 
 # Decision Key
-decisions <- read_csv("customizations_log.csv")
+decisions <- read.csv("customizations_log.csv")
 
 # Merge to include decisions
 
