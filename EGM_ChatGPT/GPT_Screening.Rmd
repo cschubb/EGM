@@ -18,6 +18,7 @@ library(AIscreenR)
 library(revtools)
 library(tibble)
 library(dplyr)
+library(tidyverse)
 # library(purrr) Removed due to error
 library(usethis)
 library(future)
@@ -34,10 +35,22 @@ decisions <- read.csv("customizations_log.csv")
 
 # Merge to include decisions
 
-decisions <- decisions %>%
-              group_by(article_id, user_id, key)
+decisions_clean <- decisions %>%
+              select(created_at, user_id, article_id, key) %>%
+              group_by(article_id, user_id, key) %>% 
+              # rename by coder
+              mutate(user_id = as.character(user_id),  # Convert user_id to character for case_when function
+         user_id = case_when(
+           user_id == "231089" ~ "CS",
+           user_id == "296869" ~ "HS",
+           TRUE ~ user_id  # Keeps other values as they are
+         ))
+
+table(decisions_clean$key)
+
 
 ```
+
 
 ## Create Prompt 
 ```{r prompt}
