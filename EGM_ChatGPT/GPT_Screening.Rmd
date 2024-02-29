@@ -33,21 +33,72 @@ screen_dat <- revtools::read_bibliography("Screening1_withResults.ris")
 # Decision Key
 decisions <- read.csv("customizations_log.csv")
 
-# Merge to include decisions
+# Preview dataset as is
+
+table(decisions$key)
+table(decisions$value)
+```
+## Clean RIS file
+
+```{r clean-RIS}
+
+screen_dat <- screen_dat %>%
+              # removes ""rayyan-" to match decisions csv file 
+              mutate(accession = sub("rayyan-", "", accession)) %>%
+              rename(article_id = accession) %>%
+              mutate(article_id = as.character(article_id))
+```
+
+
+## Clean decisions
+
+We found that the csv file from Rayyan was pulling a lot of extra information, including any time that labels were created or removed.  We wanted to make sure that our clean data only included the ultimate decisions to include, exclude, or maybe from both coders. 
+
+Our cleaning decisions were based on [Rayyan's guidance one xporting references/articles in Rayyan] <https://help.rayyan.ai/hc/en-us/articles/4409161118737-Export-references-articles-in-Rayyan>.  
+
+"Each action in the log file is logged with timestamp, user email, article ID and details of the action. The value after the included key determines the decision on the article (-1 exclude/ 0 maybe/ 1 include). While for labels/reasons, the key will be the label/reason and the value will show whether this label/reason was added (1), or deleted."
+
+```{r clean-decisions, warning=FALSE}
+# Clean dataset
 
 decisions_clean <- decisions %>%
-              select(created_at, user_id, article_id, key) %>%
+              select(created_at, user_id, article_id, key, value) %>%
               group_by(article_id, user_id, key) %>% 
-              # rename by coder
+  mutate(article_id = as.character(article_id)) %>%
+           # convert time stamp format
+  mutate(created_at = as.POSIXct(created_at, format = "%Y-%m-%dT%H:%M:%OS", tz = "UTC")) %>%    
+  # rename by coder
               mutate(user_id = as.character(user_id),  # Convert user_id to character for case_when function
          user_id = case_when(
            user_id == "231089" ~ "CS",
            user_id == "296869" ~ "HS",
            TRUE ~ user_id  # Keeps other values as they are
-         ))
+         )) %>%
+        rename(decision = value) %>%
+        mutate(decision = as.character(decision), 
+               decision = case_when(
+                 decision == "-1" ~ "exclude", 
+                  decision == "0" ~ "maybe",
+                  decision == "1" ~ "include",
+                 TRUE ~ decision)) %>%
+  # removes all labels and notes
+        filter(grepl("included", key)) %>%
+  #Filter to keep only the most recent decision for each user
+    group_by(user_id, article_id) %>%
+  filter(created_at == max(created_at)) %>%
+  ungroup()
 
-table(decisions_clean$key)
+table(decisions_clean$decision)
 
+```
+
+## Merge citations and decisions
+Once all of the data was cleaned, we merged our citation RIS file with the decisions.  We reduced this to only include the columns we were most interested in. 
+
+```{r merge}
+merged_dataset <- decisions_clean %>%
+  left_join(screen_dat, by = "article_id") %>%
+  select(created_at, user_id, article_id, key, decision, type, title, year, journal, volume, issue, author, keywords, abstract)
 
 ```
 
@@ -58,9 +109,13 @@ prompt <- "Evaluate the following study based on the selection criteria for a sy
 ```
 
 ## Prepare for Test 
-Running test with one single study to avoid upcharges. 
+
+For testing purposes, we will be selecting 10 articles. This will help us avoid charges before the code is ready. 
 ```{r subset-test eval=FALSE}
-test_data <- subset()
+test_articles <- c("1074364391", "1074364410", "1074364509", "1074364513", "1074364390")
+test_data <- merged_dataset %>%
+              filter(article_id %in% test_articles) %>%
+              group_by(article_id)
 ```
 
 ## API Key Set Up
@@ -89,9 +144,9 @@ This price is an estimate of 100% Chat GPT screening.  Price may vary depending 
 ```{r API-price}
 app_obj <- 
   approximate_price_gpt(
-    data = screen_dat, # RIS data
+    data = merged_dataset, # RIS data
     prompt = prompt, 
-    studyid = accession, # indicate the variable with the studyid in the data
+    studyid = article_id, # indicate the variable with the studyid in the data
     title = title, # indicate the variable with the titles in the data
     abstract = abstract, # indicate the variable with the abstracts in the data
     model = c("gpt-3.5-turbo-0613", "gpt-3.5-turbo-0613", "gpt-4"),

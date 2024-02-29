@@ -1,0 +1,39 @@
+---
+title: "Rayyan Progress"
+author: "Caroline Sutton Chubb"
+date: "2023-10-02"
+output: html_document
+---
+
+## Load Packages
+
+```{r load-packages, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(ggplot2)
+library(RColorBrewer)
+```
+
+```{r data-set}
+rayyan <- read.csv("Rayann_Screening_Status_10-2-2023.csv")
+
+rayyan$Screener <- as.factor(rayyan$Screener)
+rayyan$Decision <- as.factor(rayyan$Decision)
+rayyan$Number_of_Items <- as.numeric(rayyan$Number.of.Items)
+
+```
+
+```{r progress-bar}
+progress_chart <- ggplot(rayyan, aes(x= Number_of_Items, y = Screener, fill = Decision)) +
+geom_bar(stat = "identity", width = 0.5) +
+scale_fill_manual(values = c("#CC5939", "#6FC750", "#D1CB30", "gray80"))+ 
+  labs(x = "Number of Items", subtitle = "R in Higher Education EGM", title = "Screening Decisions", y = NULL) +
+  theme_classic()
+
+progress_chart
+```
+
+```{r save-graphic}
+ggsave("progress_chart.png", device = "png",  width = 6, height = 4)
+```
+
+

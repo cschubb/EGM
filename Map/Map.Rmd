@@ -1,0 +1,57 @@
+---
+title: "Map"
+author: "Caroline Sutton Chubb"
+date: "2024-02-29"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Data and Packages
+```{r Packages, message=FALSE, warning=FALSE, include=FALSE}
+library(tidyverse)
+library(ggthemes)
+library(scales)
+library(ggmap)
+library(viridis)
+library(viridisLite)
+```
+
+```{r dataset, message=FALSE, warning=FALSE}
+Data <- read.csv("Coded_Data.csv", na = c("", "NA", "N/A"))
+
+Inclusions <-  Data %>% 
+  filter(Include == "Y")
+```
+
+```{r prepare-data}
+Inclusions <- Inclusions %>%
+   group_by(Condensed_Outcomes, Condensed_Discipline, level) %>% 
+   summarize(total = n()) %>% 
+   mutate(proportion = total / sum(total))
+
+table(Inclusions$level)
+```
+
+```{r heatmap, warning=FALSE, echo=FALSE, fig.width=8, fig.height=(8/ 1.618)}
+#Graph
+EGM_Map <- ggplot(Inclusions, aes(x = Condensed_Discipline , y = Condensed_Outcomes, size = total, color = level)) +
+  geom_point(alpha=0.5) +
+  scale_size(range = c(5, 10), name="Number of Studies") +
+  geom_text(aes(label = total), color = "black", size = 2, nudge_y = .2) +
+  scale_fill_viridis(option = "H", breaks = c(0, 200, 400, 600)) +
+  labs(title = NULL, x = "Discipline Categories", y = "Outcomes")  +
+    theme_classic() + 
+    theme(legend.title=element_blank(), legend.position = "right", plot.subtitle = element_text(size = 10, face = "italic"),
+    plot.title = element_text(size = 16, face = "bold"), legend.text = element_text(size = 5))
+
+#Preview
+EGM_Map
+
+#Save graph
+ggsave(EGM_Map , filename = "EGM_Map.png", width = 8, height = 4.9, bg = "white")
+ggsave(EGM_Map , filename = "EGM_Map.pdf", width = 8, height = 4.9, bg = "white")
+
+```

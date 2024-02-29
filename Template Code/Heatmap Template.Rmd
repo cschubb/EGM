@@ -1,0 +1,41 @@
+---
+title: "EGM"
+author: "Caroline Sutton Chubb"
+date: "2024-02-29"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r heatmap, warning=FALSE, echo=FALSE, fig.width=8, fig.height=(8/ 1.618)}
+#Summarized dataset by month and borough 
+rats_heat <- rats_clean %>% 
+  filter(sighting_year == "2015") %>% 
+  group_by(sighting_month, borough) %>% 
+  summarize(total = n()) %>% 
+  group_by(sighting_month) %>% 
+  mutate(proportion = total / sum(total)) %>%
+  mutate(
+  sighting_month = month(sighting_month, label=TRUE))
+
+#Graph
+library(viridisLite)
+rat_2015 <- ggplot(rats_heat, aes(x = borough , y = fct_rev(sighting_month), fill = total)) +
+  geom_tile() + 
+  geom_text(aes(label = total), color = "white", size = 3) +
+  scale_fill_viridis(option = "H", breaks = c(0, 200, 400, 600)) +
+  labs(title = "New York City's Rat Sightings in 2015 ",
+    subtitle = "Total number of rat sightings by borough", x = NULL, y = NULL, caption = "Source: https://www.kaggle.com/datasets/new-york-city/nyc-rat-sightings") +
+  theme_classic() + theme(legend.title=element_blank(), legend.position = "right", plot.subtitle = element_text(size = 10, face = "italic"), 
+    plot.title = element_text(size = 16, face = "bold"), legend.text = element_text(size = 5))
+
+#Preview
+rat_2015 
+
+#Save graph
+ggsave(rat_2015 , filename = "output/rat_2015 .png", width = 8, height = 4.9, bg = "white")
+ggsave(rat_2015 , filename = "output/rat_2015 .pdf", width = 8, height = 4.9, bg = "white")
+
+```
