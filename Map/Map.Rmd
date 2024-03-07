@@ -29,14 +29,14 @@ Inclusions <-  Data %>%
 
 ```{r prepare-data}
 Inclusions <- Inclusions %>%
-   group_by(Condensed_Outcomes, Condensed_Discipline, level) %>% 
+   group_by(Condensed_Outcomes, Condensed_Discipline, level, Study_Design) %>% 
    summarize(total = n()) %>% 
    mutate(proportion = total / sum(total))
 
 table(Inclusions$level)
 ```
 
-```{r heatmap, warning=FALSE, echo=FALSE, fig.width=8, fig.height=(8/ 1.618)}
+```{r EGM-1, warning=FALSE, echo=FALSE, fig.width=8, fig.height=(8/ 1.618)}
 #Graph
 set.seed(3)
 
@@ -58,5 +58,38 @@ EGM_Map
 #Save graph
 ggsave(EGM_Map , filename = "EGM_Map.png", width = 8, height = 4.9, bg = "white")
 ggsave(EGM_Map , filename = "EGM_Map.pdf", width = 8, height = 4.9, bg = "white")
+
+```
+
+```{r prepare-data}
+Inclusions_2 <- Inclusions %>%
+   group_by(Condensed_Outcomes, Condensed_Discipline, Study_Design) %>% 
+   summarize(total = n()) %>% 
+   mutate(proportion = total / sum(total))
+
+table(Inclusions_2$level)
+```
+
+```{r EGM-2, warning=FALSE, echo=FALSE, fig.width=8, fig.height=(8/ 1.618)}
+#Graph
+set.seed(3333)
+
+EGM_Map_Design <- ggplot(Inclusions_2, aes(x = Condensed_Discipline , y = Condensed_Outcomes, size = total, color = Study_Design)) +
+  geom_point(alpha=0.5, position=position_jitter(h=0.2,w=0.25)) +
+  geom_text_repel(aes(label = total, color = Study_Design),
+                  force = .5, force_pull= 2, size =2.5, segment.colour = NA, box.padding = .5) +
+  scale_colour_brewer(palette="Set2") +
+  scale_size(range = c(5, 10), name="Number of Studies") +
+    theme_classic() + 
+    theme(legend.title=element_blank(), legend.position = "right", plot.subtitle = element_text(size = 10, face = "italic"),
+    plot.title = element_text(size = 16, face = "bold"), legend.text = element_text(size = 5)) +
+  guides(size = FALSE)
+
+#Preview
+EGM_Map_Design
+
+#Save graph
+ggsave(EGM_Map_Design , filename = "EGM_Map.png", width = 8, height = 4.9, bg = "white")
+ggsave(EGM_Map_Design , filename = "EGM_Map.pdf", width = 8, height = 4.9, bg = "white")
 
 ```
