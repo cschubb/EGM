@@ -74,16 +74,21 @@ table(Inclusions_2$Study_Design)
 #Graph
 set.seed(3333)
 
-EGM_Map_Design <- ggplot(Inclusions_2, aes(x = Condensed_Discipline , y = Condensed_Outcomes, size = total, color = Study_Design)) +
-  geom_point(alpha=0.5, position=position_jitter(h=0.2,w=0.25)) +
+EGM_Map_Design <- ggplot(Inclusions_2, 
+                         aes(x = Condensed_Discipline , y = Condensed_Outcomes, 
+                             size = total, color = Study_Design)) +
+  geom_point(alpha=0.5, position=position_jitter(h=0.3, w=0.25)) +
   geom_text_repel(aes(label = total, color = Study_Design),
-                  force = .5, force_pull= 2, size =2.5, segment.colour = NA, box.padding = .5) +
+                  force = 1.5, force_pull= -.35, size =2.5, 
+                  segment.colour = NA, box.padding = .7, show.legend = FALSE) +
   scale_colour_brewer(palette="Set2") +
   scale_size(range = c(5, 10), name="Number of Studies") +
   labs(title = NULL, x = "Discipline Categories", y = "Outcomes")  +
     theme_classic() + 
-    theme(legend.title=element_blank(), legend.position = "right", plot.subtitle = element_text(size = 10, face = "italic"),
-    plot.title = element_text(size = 16, face = "bold"), legend.text = element_text(size = 5)) +
+    theme(legend.title=element_blank(), legend.position = "right", 
+          plot.subtitle = element_text(size = 10, face = "italic"),
+    plot.title = element_text(size = 16, face = "bold"), 
+    legend.text = element_text(size = 5)) +
   guides(size = FALSE)
 
 #Preview
@@ -91,6 +96,7 @@ EGM_Map_Design
 
 #Save graph
 ggsave(EGM_Map_Design , filename = "EGM_Map2.png", width = 8, height = 4.9, bg = "white")
+ggsave(EGM_Map_Design , filename = "EGM_Map_2.svg", width = 8, height = 4.9, bg = "white")
 ggsave(EGM_Map_Design , filename = "EGM_Map2.pdf", width = 8, height = 4.9, bg = "white")
 
 ```
