@@ -29,12 +29,11 @@ Inclusions <-  Data %>%
 
 ```{r prepare-data}
 Inclusions <- Inclusions %>%
-   group_by(Author_Last, Condensed_Outcomes, Condensed_Discipline, level, Study_Design) %>% 
+   group_by(Condensed_Outcomes, Condensed_Discipline, level, Study_Design) %>% 
    summarize(total = n()) %>% 
    mutate(proportion = total / sum(total))
 
 table(Inclusions$level)
-
 ```
 
 ```{r EGM-1, warning=FALSE, echo=FALSE, fig.width=8, fig.height=(8/ 1.618)}
@@ -64,11 +63,11 @@ ggsave(EGM_Map , filename = "EGM_Map.pdf", width = 8, height = 4.9, bg = "white"
 
 ```{r prepare-data}
 Inclusions_2 <- Inclusions %>%
-   group_by(Author_Last, Condensed_Outcomes, Condensed_Discipline, Study_Design) %>% 
+   group_by(Condensed_Outcomes, Condensed_Discipline, Study_Design)%>%
    summarize(total = n()) %>% 
    mutate(proportion = total / sum(total))
 
-table(Inclusions_2$level)
+table(Inclusions_2$Study_Design)
 ```
 
 ```{r EGM-2, warning=FALSE, echo=FALSE, fig.width=8, fig.height=(8/ 1.618)}
@@ -97,15 +96,4 @@ ggsave(EGM_Map_Design , filename = "EGM_Map2.pdf", width = 8, height = 4.9, bg =
 ```
 
 
-```{r check-inclusions}
-Inclusions_check <-  Data %>% 
-  filter(Include == "Y")
-
-Inclusions_check <- Inclusions_check %>%
-   group_by(Author_Last, Condensed_Outcomes, Condensed_Discipline, level, Study_Design) %>% 
-   summarize(total = n()) %>% 
-   mutate(proportion = total / sum(total))
-
-table(Inclusions_check$level)
-```
 
