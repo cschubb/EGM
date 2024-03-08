@@ -29,11 +29,12 @@ Inclusions <-  Data %>%
 
 ```{r prepare-data}
 Inclusions <- Inclusions %>%
-   group_by(Condensed_Outcomes, Condensed_Discipline, level, Study_Design) %>% 
+   group_by(Author_Last, Condensed_Outcomes, Condensed_Discipline, level, Study_Design) %>% 
    summarize(total = n()) %>% 
    mutate(proportion = total / sum(total))
 
 table(Inclusions$level)
+
 ```
 
 ```{r EGM-1, warning=FALSE, echo=FALSE, fig.width=8, fig.height=(8/ 1.618)}
@@ -63,7 +64,7 @@ ggsave(EGM_Map , filename = "EGM_Map.pdf", width = 8, height = 4.9, bg = "white"
 
 ```{r prepare-data}
 Inclusions_2 <- Inclusions %>%
-   group_by(Condensed_Outcomes, Condensed_Discipline, Study_Design) %>% 
+   group_by(Author_Last, Condensed_Outcomes, Condensed_Discipline, Study_Design) %>% 
    summarize(total = n()) %>% 
    mutate(proportion = total / sum(total))
 
@@ -80,6 +81,7 @@ EGM_Map_Design <- ggplot(Inclusions_2, aes(x = Condensed_Discipline , y = Conden
                   force = .5, force_pull= 2, size =2.5, segment.colour = NA, box.padding = .5) +
   scale_colour_brewer(palette="Set2") +
   scale_size(range = c(5, 10), name="Number of Studies") +
+  labs(title = NULL, x = "Discipline Categories", y = "Outcomes")  +
     theme_classic() + 
     theme(legend.title=element_blank(), legend.position = "right", plot.subtitle = element_text(size = 10, face = "italic"),
     plot.title = element_text(size = 16, face = "bold"), legend.text = element_text(size = 5)) +
@@ -89,7 +91,21 @@ EGM_Map_Design <- ggplot(Inclusions_2, aes(x = Condensed_Discipline , y = Conden
 EGM_Map_Design
 
 #Save graph
-ggsave(EGM_Map_Design , filename = "EGM_Map.png", width = 8, height = 4.9, bg = "white")
-ggsave(EGM_Map_Design , filename = "EGM_Map.pdf", width = 8, height = 4.9, bg = "white")
+ggsave(EGM_Map_Design , filename = "EGM_Map2.png", width = 8, height = 4.9, bg = "white")
+ggsave(EGM_Map_Design , filename = "EGM_Map2.pdf", width = 8, height = 4.9, bg = "white")
 
 ```
+
+
+```{r check-inclusions}
+Inclusions_check <-  Data %>% 
+  filter(Include == "Y")
+
+Inclusions_check <- Inclusions_check %>%
+   group_by(Author_Last, Condensed_Outcomes, Condensed_Discipline, level, Study_Design) %>% 
+   summarize(total = n()) %>% 
+   mutate(proportion = total / sum(total))
+
+table(Inclusions_check$level)
+```
+
